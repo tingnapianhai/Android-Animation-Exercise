@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Animation Exercise</string>
+
+    <!-- Only instance of localisation as an example-->
+    <string name="breath_action_inhale">Breath In</string>
+    <string name="breath_action_exhale">Breath Out</string>
+    <string name="breath_action_pause">Hold</string>
+</resources>

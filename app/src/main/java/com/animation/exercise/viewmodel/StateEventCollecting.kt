@@ -1,0 +1,47 @@
+package com.animation.exercise.viewmodel
+
+import android.annotation.SuppressLint
+import androidx.activity.ComponentActivity
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
+import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+
+@Composable
+fun <S> StateViewModel<S>.collectState(): State<S> =
+    stateFlow.collectAsStateWithLifecycle()
+
+fun <S> StateViewModel<S>.collectState(
+    activity: ComponentActivity,
+    onState: (S) -> Unit
+): Job = activity.lifecycleScope.launch {
+    stateFlow.flowWithLifecycle(activity.lifecycle).collect(onState)
+}
+
+@SuppressLint("ComposableNaming")
+@Composable
+fun <S, E> StateEventViewModel<S, E>.collectEvents(onEvent: (event: E) -> Unit) {
+    val lifecycle = LocalLifecycleOwner.current.lifecycle
+    LaunchedEffect(Unit) { eventsFlow.flowWithLifecycle(lifecycle).collect(onEvent) }
+}
+
+@SuppressLint("ComposableNaming")
+@Composable
+fun <E> EventViewModel<E>.collectEvents(onEvent: (event: E) -> Unit) {
+    val lifecycle = LocalLifecycleOwner.current.lifecycle
+    LaunchedEffect(Unit) { eventsFlow.flowWithLifecycle(lifecycle).collect(onEvent) }
+}
+
+fun <E> EventViewModel<E>.collectEvents(activity: ComponentActivity, onEvent: (event: E) -> Unit) {
+    val lifecycle = activity.lifecycle
+    launch { eventsFlow.flowWithLifecycle(lifecycle).collect(onEvent) }
+}
+
+fun <S, E> StateEventViewModel<S, E>.collectEvents(activity: ComponentActivity, onEvent: (E) -> Unit) = with(activity) {
+    launch { eventsFlow.flowWithLifecycle(lifecycle).collect(onEvent) }
+}
